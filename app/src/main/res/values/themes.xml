@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.M1NXVip" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#7B5CF5</item>
+        <item name="colorPrimaryVariant">#00E5FF</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:windowBackground">#0A0C10</item>
+        <item name="android:statusBarColor">#0A0C10</item>
+        <item name="android:navigationBarColor">#12151C</item>
+    </style>
+</resources>
