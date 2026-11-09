@@ -20,8 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Accept Android SDK licenses
-        run: |
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Install build tools & platform
         run: |
@@ -29,6 +28,33 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0" \
             "platform-tools"
+
+      - name: Download Gradle wrapper jar
+        run: |
+          mkdir -p gradle/wrapper
+          curl -fL -o gradle/wrapper/gradle-wrapper.jar \
+            "https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar"
+
+      - name: Generate launcher icons
+        run: |
+          sudo apt-get install -y imagemagick -q
+          for dpi in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            case $dpi in
+              mdpi)    size=48;;
+              hdpi)    size=72;;
+              xhdpi)   size=96;;
+              xxhdpi)  size=144;;
+              xxxhdpi) size=192;;
+            esac
+            mkdir -p app/src/main/res/mipmap-$dpi
+            convert -size ${size}x${size} xc:'#7B5CF5' \
+              -fill white -gravity center \
+              -font DejaVu-Sans-Bold -pointsize $((size/3)) \
+              -annotate 0 "NX" \
+              app/src/main/res/mipmap-$dpi/ic_launcher.png
+            cp app/src/main/res/mipmap-$dpi/ic_launcher.png \
+               app/src/main/res/mipmap-$dpi/ic_launcher_round.png
+          done
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -40,12 +66,6 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
-
-      - name: Download Gradle wrapper jar
-        run: |
-          mkdir -p gradle/wrapper
-          curl -L -o gradle/wrapper/gradle-wrapper.jar \
-            https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
